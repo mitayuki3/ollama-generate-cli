@@ -4,7 +4,7 @@ import { Command } from "commander";
 
 /**
  * 指定ファイルの内容を読み込み、Ollama で続きを生成して出力する
- * -i オプションがある場合、生成結果を入力ファイルの末尾に追記する
+ * -a オプションがある場合、生成結果を入力ファイルの末尾に追記する
  */
 
 function printUsageAndExit() {
@@ -18,14 +18,14 @@ function printUsageAndExit() {
 	const program = new Command();
 	program
 		.argument("<inputfile>", "入力ファイル")
-		.option("-i, --inplace", "生成結果を入力ファイルの末尾に追記する")
+		.option("-a, --append", "生成結果を入力ファイルの末尾に追記する")
 		.option("--system <systemfile>", "システムメッセージファイル")
 		.showHelpAfterError();
 
 	program.parse(process.argv);
 	const opts = program.opts();
 	const filePath = program.args[0];
-	const inplace = opts.inplace || false;
+	const append = opts.append || false;
 	const systemFile = opts.system;
 
 	if (!filePath) {
@@ -60,7 +60,7 @@ function printUsageAndExit() {
 	if (!output) {
 		console.error("Fatal error: response = %s", output);
 	}
-	if (inplace) {
+	if (append) {
 		try {
 			await fs.appendFile(filePath, `${output}\r\n`);
 		} catch (err) {
