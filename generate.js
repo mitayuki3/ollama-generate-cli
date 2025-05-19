@@ -1,37 +1,47 @@
 import fs from "node:fs/promises";
 import ollama from "ollama";
+import { Command } from "commander";
 
 /**
  * 指定ファイルの内容を読み込み、Ollama で続きを生成して出力する
  * -i オプションがある場合、生成結果を入力ファイルの末尾に追記する
  */
 
+function printUsageAndExit() {
+	console.error(
+		"Usage: node generate.js [--system <systemfile>] [-i] <inputfile>",
+	);
+	process.exit(1);
+}
+
 (async () => {
-	const args = process.argv.slice(2);
-	const inplace = args.includes("-i");
-	const systemIdx = args.indexOf("--system");
+	const program = new Command();
+	program
+		.argument("<inputfile>", "入力ファイル")
+		.option("-i, --inplace", "生成結果を入力ファイルの末尾に追記する")
+		.option("--system <systemfile>", "システムメッセージファイル")
+		.showHelpAfterError();
+
+	program.parse(process.argv);
+	const opts = program.opts();
+	const filePath = program.args[0];
+	const inplace = opts.inplace || false;
+	const systemFile = opts.system;
+
+	if (!filePath) {
+		printUsageAndExit();
+	}
+
 	let systemMessage = undefined;
-	let filePath;
-	if (systemIdx !== -1) {
-		const sysFile = args[systemIdx + 1];
-		if (!sysFile) {
-			printUsageAndExit();
-		}
+	if (systemFile) {
 		try {
-			systemMessage = await fs.readFile(sysFile, "utf-8");
+			systemMessage = await fs.readFile(systemFile, "utf-8");
 		} catch (err) {
 			console.error("システムメッセージファイルの読み込みに失敗しました:", err);
 			process.exit(1);
 		}
-		filePath = args.find(
-			(arg, i) => i !== systemIdx && i !== systemIdx + 1 && arg !== "-i",
-		);
-	} else {
-		filePath = args.find((arg) => arg !== "-i");
 	}
-	if (!filePath) {
-		printUsageAndExit();
-	}
+
 	let input;
 	try {
 		input = await fs.readFile(filePath, "utf-8");
@@ -61,13 +71,3 @@ import ollama from "ollama";
 		console.log(output);
 	}
 })();
-
-/**
- * コマンドの使い方を標準エラー出力に表示し、プロセスを終了する
- */
-function printUsageAndExit() {
-	console.error(
-		"Usage: node generate.js [--system <systemfile>] [-i] <inputfile>",
-	);
-	process.exit(1);
-}
