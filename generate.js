@@ -20,6 +20,7 @@ function printUsageAndExit() {
 		.argument("<inputfile>", "入力ファイル")
 		.option("-a, --append", "生成結果を入力ファイルの末尾に追記する")
 		.option("--system <systemfile>", "システムメッセージファイル")
+		.option("--model <model>", "使用するモデル名 (デフォルト: gemma3:12b)")
 		.showHelpAfterError();
 
 	program.parse(process.argv);
@@ -27,6 +28,7 @@ function printUsageAndExit() {
 	const filePath = program.args[0];
 	const append = opts.append || false;
 	const systemFile = opts.system;
+	const model = opts.model || "gemma3:12b";
 
 	if (!filePath) {
 		printUsageAndExit();
@@ -50,7 +52,7 @@ function printUsageAndExit() {
 		process.exit(1);
 	}
 	const response = await ollama.generate({
-		model: "gemma3:12b",
+		model: model,
 		prompt: input,
 		stream: false,
 		keep_alive: "15m",
