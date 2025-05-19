@@ -2,9 +2,10 @@
   "name": "ollama-cli",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "main.js",
   "scripts": {
-    "generate": "node generate",
+    "generate": "node generate.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
