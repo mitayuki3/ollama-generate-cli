@@ -1,15 +1,14 @@
 {
-  "name": "ollama-cli",
-  "version": "1.0.0",
+  "name": "ollama-generate-cli",
+  "version": "0.1.0",
   "description": "",
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "generate": "node generate.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "generate": "node generate.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Yuki MITA",
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
   "dependencies": {
